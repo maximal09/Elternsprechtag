@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#243b53">
+<title>Elternsprechtag · Gesprächsnotizen</title>
+<style>
+:root{--ink:#243447;--muted:#64748b;--line:#dce4ec;--paper:#f5f7fa;--white:#fff;--blue:#315b7d;--blue2:#eaf1f7;--green:#28745b;--red:#a63d40;--shadow:0 10px 30px rgba(25,45,65,.08)}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:linear-gradient(125deg,#20384e,#426b87);color:#fff;padding:30px max(22px,calc((100% - 1180px)/2))}
+header h1{margin:0 0 5px;font-size:clamp(25px,4vw,34px);letter-spacing:-.5px}header p{margin:0;color:#e1ebf2}
+main{max-width:1180px;margin:26px auto;padding:0 18px 50px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+input,textarea,button{font:inherit}input[type="search"],input[type="text"],textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;background:#fff;color:var(--ink);outline:none}
+input:focus,textarea:focus{border-color:#6c91ad;box-shadow:0 0 0 3px #dceaf4}
+.search{flex:1;min-width:220px}.btn{border:0;border-radius:10px;padding:10px 15px;background:var(--blue);color:#fff;cursor:pointer;font-weight:600}
+.btn:hover{filter:brightness(1.08)}.btn.secondary{background:#e7edf2;color:var(--ink)}.btn.outline{background:#fff;color:var(--blue);border:1px solid #b9cad8}.btn.danger{background:#f8e9e9;color:var(--red)}.btn.small{padding:7px 10px;font-size:13px}
+.layout{display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px;align-items:start}
+.panel,.student-card{background:var(--white);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow)}
+.panel{padding:18px}.panel h2{font-size:18px;margin:0 0 14px}.field{margin:0 0 13px}.field label{display:block;font-size:13px;font-weight:700;color:#4b5e70;margin-bottom:6px}
+textarea{resize:vertical;min-height:150px}
+.voice-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.hint{font-size:12px;color:var(--muted);margin:8px 0 0}
+.list-head{display:flex;justify-content:space-between;align-items:center;margin:0 0 12px}.list-head h2{font-size:19px;margin:0}.count{font-size:13px;color:var(--muted)}
+.students{display:grid;gap:13px}
+.student-card{padding:17px 18px}.student-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.student-top h3{font-size:20px;margin:0 0 3px}.student-actions{display:flex;gap:7px;flex-wrap:wrap}
+.section-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:15px}
+.section{border-top:2px solid #e4ebf1;padding-top:9px}.section h4{font-size:13px;color:#45647d;margin:0 0 6px}.section p{margin:0;white-space:pre-wrap;color:#34495b}
+.empty{padding:35px;text-align:center;color:var(--muted);background:#fff;border:1px dashed #c8d4de;border-radius:14px}
+.notice{font-size:13px;color:#526579;background:#edf3f7;padding:12px 14px;border-radius:10px;margin-top:14px}
+.modal-backdrop{position:fixed;inset:0;background:#13263888;display:none;align-items:center;justify-content:center;padding:18px;z-index:5}
+.modal-backdrop.open{display:flex}.modal{background:#fff;border-radius:16px;max-width:700px;width:100%;max-height:92vh;overflow:auto;padding:22px;box-shadow:0 20px 60px #10203055}
+.modal h2{margin:0 0 16px}.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.modal-grid textarea{min-height:110px}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.status{font-size:12px;color:var(--muted);min-height:18px;margin-top:5px}
+footer{text-align:center;color:#8291a0;font-size:12px;margin-top:24px}
+@media(max-width:820px){.layout{grid-template-columns:1fr}.section-grid,.modal-grid{grid-template-columns:1fr}.student-top{flex-direction:column}}
+@media print{body{background:#fff}header{background:#fff;color:#111;padding:0 0 18px}header p{color:#444}main{max-width:none;margin:0;padding:0}.toolbar,.panel,.student-actions,footer{display:none!important}.layout{display:block}.student-card{box-shadow:none;break-inside:avoid;margin-bottom:12px}.students{gap:0}.section{border-color:#ddd}.section h4{color:#333}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Elternsprechtag</h1>
+  <p>Gesprächsnotizen · Lern- und Sozialverhalten · Klasse 3a</p>
+</header>
+<main>
+  <div class="toolbar">
+    <input class="search" id="search" type="search" placeholder="Kind suchen …" aria-label="Kind suchen">
+    <button class="btn secondary" id="exportBtn">Export JSON</button>
+    <button class="btn secondary" id="importBtn">Import JSON</button>
+    <input type="file" id="importFile" accept=".json,application/json" hidden>
+    <button class="btn outline" onclick="window.print()">Drucken</button>
+  </div>
+  <div class="layout">
+    <section class="panel">
+      <h2>Kind hinzufügen</h2>
+      <form id="addForm">
+        <div class="field"><label for="childName">Name des Kindes</label><input id="childName" type="text" required placeholder="Vorname Nachname"></div>
+        <div class="field">
+          <label for="rawNotes">Deine Beobachtungen</label>
+          <textarea id="rawNotes" placeholder="Diktiere oder tippe hier frei deine Beobachtungen. Du musst sie nicht vorsortieren."></textarea>
+          <div class="voice-row">
+            <button type="button" class="btn" id="micBtn">🎙 Diktat starten</button>
+            <button type="button" class="btn secondary" id="stopBtn" disabled>Stopp</button>
+          </div>
+          <div class="status" id="voiceStatus" aria-live="polite"></div>
+          <p class="hint">Die Diktierfunktion benötigt einen kompatiblen Browser (z. B. Chrome oder Edge) und eine Mikrofonfreigabe. Alternativ kannst du deine Notizen eintippen.</p>
+        </div>
+        <button class="btn" type="submit">Kind speichern</button>
+      </form>
+      <div class="notice"><strong>Hinweis zur Formulierung:</strong> Eine statische HTML-Datei kann keine KI-Texte selbst erzeugen. Nach dem Diktat kannst du deine Notizen mit „Gesprächsgrundlage formulieren“ an ChatGPT übergeben. Die vier Bereiche lassen sich anschließend hier eintragen und jederzeit bearbeiten.</div>
+    </section>
+    <section>
+      <div class="list-head"><h2>Gesprächsübersicht</h2><span class="count" id="count">0 Kinder</span></div>
+      <div class="students" id="students"></div>
+    </section>
+  </div>
+  <footer>Die Einträge werden lokal in diesem Browser gespeichert. Exportiere regelmäßig eine JSON-Sicherung.</footer>
+</main>
+
+<div class="modal-backdrop" id="editBackdrop" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+  <div class="modal">
+    <h2 id="editTitle">Gesprächsgrundlage bearbeiten</h2>
+    <form id="editForm">
+      <input type="hidden" id="editId">
+      <div class="field"><label for="editName">Name des Kindes</label><input id="editName" type="text" required></div>
+      <div class="modal-grid">
+        <div class="field"><label for="editStrengths">1. Stärken & Positives</label><textarea id="editStrengths"></textarea></div>
+        <div class="field"><label for="editDevelopment">2. Beobachtungen & Entwicklungsfelder</label><textarea id="editDevelopment"></textarea></div>
+        <div class="field"><label for="editSchool">3. Pädagogische Konsequenz in der Schule</label><textarea id="editSchool"></textarea></div>
+        <div class="field"><label for="editHome">4. Empfehlung für zu Hause</label><textarea id="editHome"></textarea></div>
+      </div>
+      <div class="field"><label for="editRaw">Ursprüngliche Notizen / Diktat</label><textarea id="editRaw" style="min-height:90px"></textarea></div>
+      <div class="modal-footer"><button type="button" class="btn secondary" id="cancelEdit">Abbrechen</button><button type="submit" class="btn">Änderungen speichern</button></div>
+    </form>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = "elternsprechtag_kinder_v1";
+const starter = [{
+ id:"julian-001", name:"Julian",
+ strengths:"Julian ist ein sehr aufmerksamer, lernwilliger und motivierter Schüler. Er zeigt große Freude am Lernen und erzielt sehr gute schulische Leistungen. Im Unterricht zeigt sich ein durchweg positives Bild.",
+ development:"Aktuell sehe ich kaum Entwicklungsfelder. Ich möchte lediglich seine Selbstständigkeit noch weiter stärken.",
+ school:"Ich ermutige Julian, Aufgaben zunehmend eigenständig zu beginnen und eigene Lösungswege zu finden. Dafür übertrage ich ihm bewusst Verantwortung und gebe ihm Zeit, selbst Lösungen zu entwickeln.",
+ home:"Julian kann auch zu Hause darin bestärkt werden, kleine Aufgaben und Herausforderungen zunächst selbstständig zu bewältigen. Hilfreich ist, ihm etwas Zeit zum eigenen Ausprobieren zu lassen, bevor Unterstützung angeboten wird.",
+ raw:"Sehr aufmerksam, lernwillig und motiviert. Keine Probleme im Unterricht. Sehr gute Leistungen. Selbstständigkeit eventuell noch weiter fördern."
+}];
+let children = load();
+function load(){try{const x=JSON.parse(localStorage.getItem(STORAGE_KEY));return Array.isArray(x)?x:starter.slice()}catch(e){return starter.slice()}}
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(children))}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function render(){
+ const q=document.getElementById("search").value.trim().toLocaleLowerCase("de");
+ const visible=children.filter(c=>c.name.toLocaleLowerCase("de").includes(q));
+ document.getElementById("count").textContent=`${visible.length} ${visible.length===1?"Kind":"Kinder"}`;
+ const root=document.getElementById("students");
+ if(!visible.length){root.innerHTML='<div class="empty">Keine Kinder gefunden. Füge links ein Kind hinzu oder ändere deine Suche.</div>';return}
+ root.innerHTML=visible.map(c=>`
+ <article class="student-card">
+  <div class="student-top"><div><h3>${esc(c.name)}</h3><span class="count">Gesprächsgrundlage</span></div>
+   <div class="student-actions">
+    <button class="btn small outline" data-action="prompt" data-id="${esc(c.id)}">Gesprächsgrundlage formulieren</button>
+    <button class="btn small secondary" data-action="edit" data-id="${esc(c.id)}">Bearbeiten</button>
+    <button class="btn small danger" data-action="delete" data-id="${esc(c.id)}">Löschen</button>
+   </div>
+  </div>
+  <div class="section-grid">
+   <div class="section"><h4>1. Stärken & Positives</h4><p>${esc(c.strengths||"Noch nicht ausgefüllt.")}</p></div>
+   <div class="section"><h4>2. Beobachtungen & Entwicklungsfelder</h4><p>${esc(c.development||"Noch nicht ausgefüllt.")}</p></div>
+   <div class="section"><h4>3. Pädagogische Konsequenz in der Schule</h4><p>${esc(c.school||"Noch nicht ausgefüllt.")}</p></div>
+   <div class="section"><h4>4. Empfehlung für zu Hause</h4><p>${esc(c.home||"Noch nicht ausgefüllt.")}</p></div>
+  </div>
+ </article>`).join("");
+}
+document.getElementById("addForm").addEventListener("submit",e=>{
+ e.preventDefault();const name=document.getElementById("childName").value.trim(),raw=document.getElementById("rawNotes").value.trim();
+ if(!name)return;
+ children.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),name,raw,strengths:"",development:"",school:"",home:""});
+ save();render();e.target.reset();document.getElementById("voiceStatus").textContent="Kind wurde gespeichert. Öffne „Gesprächsgrundlage formulieren“, um die Notizen an ChatGPT zu übergeben.";
+});
+document.getElementById("search").addEventListener("input",render);
+const backdrop=document.getElementById("editBackdrop");
+function openEdit(c){
+ document.getElementById("editId").value=c.id;document.getElementById("editName").value=c.name;
+ document.getElementById("editStrengths").value=c.strengths||"";document.getElementById("editDevelopment").value=c.development||"";
+ document.getElementById("editSchool").value=c.school||"";document.getElementById("editHome").value=c.home||"";
+ document.getElementById("editRaw").value=c.raw||"";backdrop.classList.add("open");
+}
+document.getElementById("cancelEdit").onclick=()=>backdrop.classList.remove("open");
+document.getElementById("editForm").addEventListener("submit",e=>{
+ e.preventDefault();const c=children.find(x=>x.id===document.getElementById("editId").value);if(!c)return;
+ c.name=document.getElementById("editName").value.trim();
+ c.strengths=document.getElementById("editStrengths").value.trim();c.development=document.getElementById("editDevelopment").value.trim();
+ c.school=document.getElementById("editSchool").value.trim();c.home=document.getElementById("editHome").value.trim();c.raw=document.getElementById("editRaw").value.trim();
+ save();render();backdrop.classList.remove("open");
+});
+document.getElementById("students").addEventListener("click",async e=>{
+ const b=e.target.closest("button[data-action]");if(!b)return;const c=children.find(x=>x.id===b.dataset.id);if(!c)return;
+ if(b.dataset.action==="edit")openEdit(c);
+ if(b.dataset.action==="delete"&&confirm(`Eintrag für ${c.name} wirklich löschen?`)){children=children.filter(x=>x.id!==c.id);save();render()}
+ if(b.dataset.action==="prompt"){
+  const prompt=`Bitte erstelle eine wertschätzende, sachliche und lösungsorientierte Gesprächsgrundlage für den Elternsprechtag. Gliedere in genau vier Punkte: 1. Stärken & Positives, 2. Beobachtungen & Entwicklungsfelder (als sachliche Ich-Botschaften, ohne Vorwürfe), 3. Pädagogische Konsequenz in der Schule, 4. Empfehlung für zu Hause. Bitte knapp und konkret formulieren.\n\nKind: ${c.name}\nMeine ursprünglichen Beobachtungen:\n${c.raw||"Keine ursprünglichen Notizen hinterlegt."}\n\nGib die vier Abschnitte so aus, dass ich sie in die entsprechenden Felder der App übernehmen kann. Erfinde keine Beobachtungen.`;
+  try{await navigator.clipboard.writeText(prompt);alert("Der Prompt wurde kopiert. Öffne ChatGPT, füge ihn ein und übertrage die vier Ergebnisse anschließend über „Bearbeiten“ in die Felder.")}catch(err){window.prompt("Kopiere diesen Text und füge ihn in ChatGPT ein:",prompt)}
+ }
+});
+document.getElementById("exportBtn").onclick=()=>{
+ const blob=new Blob([JSON.stringify(children,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=url;a.download="elternsprechtag-sicherung.json";a.click();URL.revokeObjectURL(url);
+};
+document.getElementById("importBtn").onclick=()=>document.getElementById("importFile").click();
+document.getElementById("importFile").addEventListener("change",async e=>{
+ const file=e.target.files[0];if(!file)return;
+ try{const parsed=JSON.parse(await file.text());if(!Array.isArray(parsed)||!parsed.every(x=>x&&x.name&&x.id))throw Error();
+ if(confirm("Import ersetzt die aktuell gespeicherten Einträge. Vorher am besten exportieren. Fortfahren?")){children=parsed;save();render()}
+ }catch(err){alert("Die Datei konnte nicht gelesen werden. Bitte eine gültige JSON-Sicherung auswählen.")}e.target.value="";
+});
+
+// Browser-Spracherkennung
+const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+let recognition=null;
+const micBtn=document.getElementById("micBtn"),stopBtn=document.getElementById("stopBtn"),voiceStatus=document.getElementById("voiceStatus"),rawNotes=document.getElementById("rawNotes");
+if(SpeechRecognition){
+ recognition=new SpeechRecognition();recognition.lang="de-DE";recognition.continuous=true;recognition.interimResults=true;
+ let finalText="";
+ recognition.onstart=()=>{finalText=rawNotes.value+(rawNotes.value?" ":"");micBtn.disabled=true;stopBtn.disabled=false;voiceStatus.textContent="Ich höre zu … Sprich jetzt deine Beobachtungen."};
+ recognition.onresult=event=>{let interim="";for(let i=event.resultIndex;i<event.results.length;i++){const t=event.results[i][0].transcript;if(event.results[i].isFinal)finalText+=t+" ";else interim+=t}
+ rawNotes.value=finalText+interim};
+ recognition.onerror=event=>{voiceStatus.textContent="Diktat-Fehler: "+event.error+". Du kannst deine Notizen auch eintippen.";micBtn.disabled=false;stopBtn.disabled=true};
+ recognition.onend=()=>{micBtn.disabled=false;stopBtn.disabled=true;if(!voiceStatus.textContent.startsWith("Diktat-Fehler"))voiceStatus.textContent="Diktat beendet. Du kannst den Text noch bearbeiten."};
+ micBtn.onclick=()=>{try{recognition.start()}catch(e){voiceStatus.textContent="Das Diktat läuft bereits."}};
+ stopBtn.onclick=()=>recognition.stop();
+}else{
+ micBtn.disabled=true;stopBtn.disabled=true;voiceStatus.textContent="Dein Browser unterstützt die Web-Speech-Diktierfunktion leider nicht. Bitte nutze die Texteingabe oder öffne die Seite in Chrome oder Edge.";
+}
+render();
+</script>
+</body>
+</html>
